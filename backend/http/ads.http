@@ -1,0 +1,61 @@
+
+
+GET http://localhost:3000/ads
+
+###
+
+GET http://localhost:3000/ads?category=1
+
+###
+
+GET http://localhost:3000/ads/category/7
+
+###
+
+GET http://localhost:3000/ads/18
+
+###
+
+GET http://localhost:3000/ads?search=KIT
+
+###
+
+POST http://localhost:3000/ads
+content-type: application/json
+
+{
+      "title": "Bike",
+      "description":
+        "My car is blue, working fine. I'm selling it because I've got a new one",
+      "owner": "car.seller@gmail.com",
+      "price": 10000,
+      "picture":
+        "https://www.automobile-magazine.fr/asset/cms/34973/config/28294/apres-plusieurs-prototypes-la-bollore-bluecar-a-fini-par-devoiler-sa-version-definitive.jpg",
+      "location": "Paris",
+      "createdAt": "2023-10-05",
+      "category":1,
+      "tags": [{"id": 1} , {"id": 3}]
+}
+
+###
+
+DELETE http://localhost:3000/ads/14
+
+
+###
+
+PUT http://localhost:3000/ads/14
+content-type: application/json
+
+{     
+      "title": "Coat to sell",
+      "description":
+        "Amazing jacket",
+      "owner": "car.seller@gmail.com",
+      "price": 500,
+      "picture":
+        "https://www.bed.com",
+      "location": "Paris",
+      "createdAt": "2023-10-05",
+      "category": 2
+}
