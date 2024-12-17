@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import AdCard from "./AdCard";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { GET_ALL_ADS } from "../graphql/queries";
+import { useGetAdsQuery } from "../generated/graphql-types";
 
 export interface AdCardProps {
   createdAt?: string;
@@ -10,51 +11,45 @@ export interface AdCardProps {
   description?: string;
   id?: number;
   title: string;
-  picture: string;
+  pictures: { id: number; url: string }[];
   price: number;
   category?: {
     id: number;
     name: string;
   };
+  tags?: { id: number; name: string }[];
+  setTotal: React.Dispatch<React.SetStateAction<number>>;
+  total: number;
 }
 
 const RecentAds = () => {
+  const { loading, error, data } = useGetAdsQuery();
   const [total, setTotal] = useState(0);
-  const [ads, setAds] = useState<AdCardProps[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchResult = await axios.get("http://localhost:3000/ads");
-        setAds(fetchResult.data);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
-    fetchData();
-  }, []);
-
-  return (
-    <>
-      <h2 className="page-title">Annonces récentes</h2>
-      <p>Prix total: {total} </p>
-      <section className="recent-ads">
-        {ads.map((ad) => (
-          <Link key={ad.id} to={`/ad/${ad.id}`}>
-            <div>
-              <AdCard title={ad.title} picture={ad.picture} price={ad.price} />
-              <button
-                className="button"
-                onClick={() => setTotal(total + ad.price)}
-              >
-                Add price to total
-              </button>
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error : {error.message}</p>;
+  if (data) {
+    return (
+      <>
+        <h2 className="page-title">Annonces récentes</h2>
+        <p>Prix total: {total} </p>
+        <section className="recent-ads">
+          {data.AllAds.map((ad) => (
+            <div className="ad-container">
+              <AdCard
+                id={ad.id}
+                title={ad.title}
+                pictures={ad.pictures}
+                price={ad.price}
+                setTotal={setTotal}
+                total={total}
+              />
             </div>
-          </Link>
-        ))}
-      </section>
-    </>
-  );
+          ))}
+        </section>
+      </>
+    );
+  }
 };
 
 export default RecentAds;

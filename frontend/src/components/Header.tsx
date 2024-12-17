@@ -1,6 +1,7 @@
-import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { GET_ALL_CATEGORIES } from "../graphql/queries";
 
 export type Category = {
   id: number;
@@ -8,22 +9,12 @@ export type Category = {
 };
 
 const Header = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { data } = useQuery(GET_ALL_CATEGORIES);
   const [search, setSearch] = useState("");
 
-  const navigate = useNavigate();
+  const categories = data?.AllCategories;
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const results = await axios.get("http://localhost:3000/categories");
-        setCategories(results.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchCategories();
-  }, []);
+  const navigate = useNavigate();
 
   const sendSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,7 +58,7 @@ const Header = () => {
         </a>
       </div>
       <nav className="categories-navigation">
-        {categories.map((category) => (
+        {categories?.map((category: Category) => (
           <Link
             key={category.id}
             to={`ads/category/${category.id}`}

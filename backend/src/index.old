@@ -1,0 +1,328 @@
+import express from "express";
+// import sqlite3 from "sqlite3";
+import "reflect-metadata";
+import { dataSource } from "./config/db";
+import {Like} from 'typeorm';
+import cors from "cors";
+
+import {Ad} from "../../backend/src/entities/ad";
+import { Category } from "./entities/category";
+import { Tag } from "./entities/tag";
+import { Picture } from "./entities/picture";
+import { validate } from "class-validator";
+
+
+// import { validate } from "class-validator";
+
+// const db = new sqlite3.Database("good_corner.sqlite")
+
+const app = express();
+
+app.use(cors());
+app.use(express.json())
+const port = 3000;
+
+app.listen(port, async () => {
+  await dataSource.initialize();
+  console.log(`Example app listening on port ${port}`);
+});
+
+// AVEC TypeORM
+
+// ADS
+
+app.get("/ads", async(req,res)=>{
+  
+try {
+  if (req.query.search) {
+    const search = req.query.search
+    const ads= await Ad.find({
+      relations: {
+        category: true,
+        tags: true,
+        pictures: true,
+      },
+      order: {
+        category: { name: "ASC"}
+      },
+      where: {
+        title: Like(`${search}%`)
+      }
+    })
+    res.send(ads)
+  }
+
+  else if(req.query.category){
+   
+    const categoryId = parseInt(req.query.category as string);
+
+    const ads = await Ad.find({
+        relations: {
+          category: true,
+          tags: true,
+          pictures: true,
+        },
+        where:{
+          category: {id:  categoryId },
+        }
+      })
+      res.send(ads)
+    }
+      
+  else{ 
+    const ads= await Ad.find({
+    relations: {
+      category: true,
+      tags: true,
+      pictures: true,
+    },
+    order: {
+      category: { name: "ASC"}
+    },
+  })
+  res.send(ads)}
+} 
+  
+  catch (error){res.status(400).send(error.message)}
+  
+})
+
+
+
+app.get("/ads/:id", async(req,res)=>{
+  try{
+    const adId: number = parseInt(req.params.id)
+    const ad = await Ad.findOne({
+      relations: {
+        category: true,
+        tags: true
+      },
+      where:{
+        id: adId,
+      }
+    })
+    res.send(ad)
+  }
+    catch(error)
+    {res.status(400).send(error.message)}
+})
+
+
+app.post("/ads", async (req,res) =>{
+  console.log("req body", req.body);
+  const pictures: Picture[] = [];
+  req.body.pictures.forEach((el : string)=>{
+    const newPicture = new Picture();
+    newPicture.url = el;
+    pictures.push(newPicture)
+  })
+
+  console.log(pictures);
+
+  const ad = new Ad(); 
+  ad.title = req.body.title;
+  ad.description = req.body.description;
+  ad.owner = req.body.owner;
+  ad.price = req.body.price;
+  ad.location = req.body.location;
+  ad.createdAt = req.body.createdAt;
+  ad.category= req.body.category ? req.body.category : 1;
+  if(req.body.tags){ad.tags = req.body.tags;} 
+  if(pictures.length >0){
+    ad.pictures = pictures;
+  }
+
+  const errors = await validate(ad);
+
+  if (errors.length > 0) {
+    console.log(errors);
+    // throw new Error("Validation failed");
+    res.status(400).send("Invalid input");
+  } else {
+    try{
+      const result = await ad.save();
+      res.send(result);
+    }catch (err) {
+      console.log("err", err);
+      res.status(400).send(JSON.stringify(err));
+    }
+  }
+})
+
+app.delete("/ads/:id", async(req,res)=>{
+  const id = parseInt(req.params.id);
+  await Ad.delete({id});
+  res.send("item deleted");
+})
+
+app.put("/ads/:id", async(req,res)=>{
+
+  try{
+    let adToUpdate = await Ad.findOneByOrFail({id: parseInt(req.params.id)});
+    console.log(req.body)
+
+    adToUpdate = Object.assign(adToUpdate, req.body);
+    const result = await adToUpdate.save()
+    if (result){res.send("ad has been updated");}
+    else {res.send("Failed updating datas")}
+  } catch(err){
+    res.status(400).send(err.message)
+  }
+  
+})
+
+// CATEGORIES
+
+app.get("/categories", async(req,res)=>{
+  try{if (req.query.name){
+    const name = req.query.name
+    const categories= await Category.find({
+      where:{ 
+        name: Like(`${name}%`)
+      }});
+      res.send(categories)
+  }else {
+    const categories= await Category.find();
+    res.send(categories)
+  }}catch(err){
+    res.status(400).send(err.message)
+  }
+})
+
+
+
+app.post("/categories", (req,res) =>{
+  const category = new Category(); 
+  category.name = req.body.name;
+    
+  category.save();
+
+  res.send(category);
+})
+
+app.delete("/categories/:id", async(req,res)=>{
+  const id = parseInt(req.params.id);
+  await Category.delete({id});
+  res.send("item deleted");
+})
+
+app.put("/categories/:id", async(req,res)=>{
+
+  try{
+    let categoryToUpdate = await Category.findOneByOrFail({id: parseInt(req.params.id)});
+
+    categoryToUpdate = Object.assign(categoryToUpdate, req.body);
+    const result = await categoryToUpdate.save();
+    
+    res.send(result);
+  } catch(err){
+    res.status(400).send(err.message)
+  }
+  
+})
+
+// TAGS
+
+app.get("/tags", async(req,res)=>{
+  try{if (req.query.name){
+    const name = req.query.name
+    const tags= await Tag.find({
+      where:{ 
+        name: Like(`${name}%`)
+      }});
+      res.send(tags)
+  }else {
+    const tags= await Tag.find();
+    res.send(tags)
+  }}catch(err){
+    res.status(400).send(err.message)
+  }
+})
+
+app.post("/tags", (req,res) =>{
+  const tag = new Tag(); 
+  tag.name = req.body.name;
+    
+  tag.save();
+
+  res.send(tag);
+})
+
+app.delete("/tags/:id", async(req,res)=>{
+  const id = parseInt(req.params.id);
+  await Tag.delete({id});
+  res.send("OK");
+})
+
+app.put("/tags/:id", async(req,res)=>{
+
+  try{
+    let tagToUpdate = await Tag.findOneByOrFail({id: parseInt(req.params.id)});
+
+    tagToUpdate = Object.assign(tagToUpdate, req.body);
+    const result = await tagToUpdate.save();
+    
+    res.send(result);
+  } catch(err){
+    res.status(400).send(err.message)
+  }
+  
+})
+
+
+
+
+
+// SANS TypeORM
+// app.get("/", (_req, res) => {
+//   res.send("Hello World!");
+// });
+
+// app.get("/ads", (req, res) => {
+//     console.log(req.query)
+//     if (req.query.location){
+//       db.all("SELECT * FROM ad WHERE location = ?", req.query.location, (_err, rows)=>{res.send(rows)})
+//     } else 
+//     { db.all("SELECT * FROM ad", (_err, rows)=>{res.send(rows)})}
+   
+//   });
+
+// app.get("/ads/:location", (req, res) => {
+//     db.all("SELECT * FROM ad WHERE location = ?", [req.params.location], (_err, rows)=>{res.send(rows)})
+//   });
+
+// app.post("/ads", (req, res) => {
+//     const statement = db.prepare("INSERT INTO ad (title, description, owner, price, picture, location, createdAt) VALUES (?,?,?,?,?,?,?)");
+//     statement.run([req.body.title, req.body.description, req.body.owner, req.body.price, req.body.picture, req.body.location, req.body.createdAt]);
+//     res.send("Request received")
+//   });
+
+// app.delete("/ads/:id", (req,res)=>{
+//     const statement = db.prepare("DELETE FROM ad WHERE id = ?");
+//     statement.run([req.params.id]);
+//     res.send("ad deleted")
+// })
+
+// app.put("/ads/:id", (req, _res) => {
+//   db.get(
+//     "SELECT * FROM ad WHERE id = (?)",
+//     req.params.id,
+//     (_err, data: any) => {
+//       const stmt = db.prepare(
+//         "UPDATE ad SET title = ?, description = ?, owner = ?, price = ?, picture = ?, location = ?, createdAt = ? WHERE id = ?"
+//       );
+//       stmt.run([
+//         req.body.title ? req.body.title : data.title,
+//         req.body.description ? req.body.description : data.description,
+//         req.body.owner ? req.body.owner : data.owner,
+//         req.body.price ? req.body.price : data.price,
+//         req.body.picture ? req.body.picture : data.picture,
+//         req.body.location ? req.body.location : data.location,
+//         req.body.createdAt ? req.body.createdAt : data.createdAt,
+//         req.params.id,
+//       ]);
+//     }
+//   );
+// })
+
+

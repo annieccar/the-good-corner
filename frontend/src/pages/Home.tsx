@@ -1,11 +1,7 @@
 import RecentAds from "../components/RecentAds";
 
 function Home() {
-  return (
-    <div>
-      <RecentAds />
-    </div>
-  );
+  return <RecentAds />;
 }
 
 export default Home;
