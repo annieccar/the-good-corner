@@ -31,6 +31,21 @@ export class AdResolver {
     return ads;
   }
 
+  @Query(() => [Ad])
+  async AllAdsByCategory(@Arg("category") categoryId: number) {
+    const ads= await Ad.find({
+        order: {
+          id: "ASC"
+        },
+        where: {
+          category: {
+            id: categoryId
+          },
+        }
+      })
+    return ads;
+  }
+
   @Query(() => Ad)
   async getAdById(@Arg("id") id: number) {
     const ad = await Ad.findOneByOrFail({

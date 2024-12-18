@@ -95,3 +95,29 @@ export const GET_AD_BY_ID = gql`
     }
   }
 `;
+
+export const GET_AD_BY_CATEGORY = gql`
+query AllAdsByCategory($category: Float!) {
+  AllAdsByCategory(category: $category) {
+    title
+    price
+    pictures {
+      id
+      url
+    }
+    owner
+    location
+    id
+    description
+    category {
+      id
+      name
+    }
+    tags {
+      id
+      name
+    }
+    createdAt
+  }
+}
+`

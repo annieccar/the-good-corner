@@ -1,21 +1,52 @@
 services: 
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_USER: admin
+      POSTGRES_DB: the-good-corner
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U admin -d the-good-corner"]
+      interval: 10s
+      timeout: 5s
+      retries: 100
+    volumes: 
+      - db-data:/var/lib/postgresql/data
+  adminer: 
+    image: adminer
+    ports:
+      - 8080:8080
+    depends_on: 
+      db: 
+        condition: service_healthy
   backend: 
     build: ./backend
     ports: 
       - 4000:4000
     volumes: 
       - ./backend/src:/app/src
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
     healthcheck: 
       test: 'curl --fail --request POST --header ''content-type: application/json'' --url ''http://localhost:4000'' --data ''{"query":"query { __typename }"}'' || exit 1'
       interval: 1s
       timeout: 2s
       retries: 100
+    depends_on: 
+      db: 
+        condition: service_healthy 
   frontend: 
     build: ./frontend
     ports: 
       - 5173:5173
     volumes: 
       - ./frontend/src:/app/src
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
     depends_on:
       backend: 
         condition: service_healthy
+volumes:
+  db-data:

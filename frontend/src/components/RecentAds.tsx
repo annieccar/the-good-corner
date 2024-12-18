@@ -1,7 +1,6 @@
 import { useState } from "react";
 import AdCard from "./AdCard";
-import { useQuery } from "@apollo/client";
-import { GET_ALL_ADS } from "../graphql/queries";
+
 import { useGetAdsQuery } from "../generated/graphql-types";
 
 export interface AdCardProps {
@@ -25,6 +24,8 @@ export interface AdCardProps {
 const RecentAds = () => {
   const { loading, error, data } = useGetAdsQuery();
   const [total, setTotal] = useState(0);
+
+  console.log(data);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error : {error.message}</p>;

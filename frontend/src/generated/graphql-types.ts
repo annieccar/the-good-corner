@@ -92,10 +92,16 @@ export type Picture = {
 export type Query = {
   __typename?: 'Query';
   AllAds: Array<Ad>;
+  AllAdsByCategory: Array<Ad>;
   AllAdsByKeyword: Array<Ad>;
   AllCategories: Array<Category>;
   AllTags: Array<Tag>;
   getAdById: Ad;
+};
+
+
+export type QueryAllAdsByCategoryArgs = {
+  category: Scalars['Float']['input'];
 };
 
 
@@ -163,6 +169,13 @@ export type GetAdByIdQueryVariables = Exact<{
 
 
 export type GetAdByIdQuery = { __typename?: 'Query', getAdById: { __typename?: 'Ad', id: number, title: string, description: string, owner: string, price: number, location: string, createdAt: any, pictures: Array<{ __typename?: 'Picture', id: number, url: string }>, category?: { __typename?: 'Category', id: number, name: string } | null, tags?: Array<{ __typename?: 'Tag', id: number, name: string }> | null } };
+
+export type AllAdsByCategoryQueryVariables = Exact<{
+  category: Scalars['Float']['input'];
+}>;
+
+
+export type AllAdsByCategoryQuery = { __typename?: 'Query', AllAdsByCategory: Array<{ __typename?: 'Ad', title: string, price: number, owner: string, location: string, id: number, description: string, createdAt: any, pictures: Array<{ __typename?: 'Picture', id: number, url: string }>, category?: { __typename?: 'Category', id: number, name: string } | null, tags?: Array<{ __typename?: 'Tag', id: number, name: string }> | null }> };
 
 
 export const DeteteAdDocument = gql`
@@ -531,3 +544,61 @@ export type GetAdByIdQueryHookResult = ReturnType<typeof useGetAdByIdQuery>;
 export type GetAdByIdLazyQueryHookResult = ReturnType<typeof useGetAdByIdLazyQuery>;
 export type GetAdByIdSuspenseQueryHookResult = ReturnType<typeof useGetAdByIdSuspenseQuery>;
 export type GetAdByIdQueryResult = Apollo.QueryResult<GetAdByIdQuery, GetAdByIdQueryVariables>;
+export const AllAdsByCategoryDocument = gql`
+    query AllAdsByCategory($category: Float!) {
+  AllAdsByCategory(category: $category) {
+    title
+    price
+    pictures {
+      id
+      url
+    }
+    owner
+    location
+    id
+    description
+    category {
+      id
+      name
+    }
+    tags {
+      id
+      name
+    }
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useAllAdsByCategoryQuery__
+ *
+ * To run a query within a React component, call `useAllAdsByCategoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllAdsByCategoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllAdsByCategoryQuery({
+ *   variables: {
+ *      category: // value for 'category'
+ *   },
+ * });
+ */
+export function useAllAdsByCategoryQuery(baseOptions: Apollo.QueryHookOptions<AllAdsByCategoryQuery, AllAdsByCategoryQueryVariables> & ({ variables: AllAdsByCategoryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AllAdsByCategoryQuery, AllAdsByCategoryQueryVariables>(AllAdsByCategoryDocument, options);
+      }
+export function useAllAdsByCategoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllAdsByCategoryQuery, AllAdsByCategoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AllAdsByCategoryQuery, AllAdsByCategoryQueryVariables>(AllAdsByCategoryDocument, options);
+        }
+export function useAllAdsByCategorySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AllAdsByCategoryQuery, AllAdsByCategoryQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AllAdsByCategoryQuery, AllAdsByCategoryQueryVariables>(AllAdsByCategoryDocument, options);
+        }
+export type AllAdsByCategoryQueryHookResult = ReturnType<typeof useAllAdsByCategoryQuery>;
+export type AllAdsByCategoryLazyQueryHookResult = ReturnType<typeof useAllAdsByCategoryLazyQuery>;
+export type AllAdsByCategorySuspenseQueryHookResult = ReturnType<typeof useAllAdsByCategorySuspenseQuery>;
+export type AllAdsByCategoryQueryResult = Apollo.QueryResult<AllAdsByCategoryQuery, AllAdsByCategoryQueryVariables>;

@@ -21,7 +21,7 @@ export class Ad extends BaseEntity {
     id: number;
 
     @Field()
-    @Column({length:5})
+    @Column()
     @Length(0,30, {
         message: "Too many characters"
     })
