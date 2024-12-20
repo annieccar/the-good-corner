@@ -13,16 +13,12 @@ services:
     volumes: 
       - db-data:/var/lib/postgresql/data
   adminer: 
-    image: adminer
-    ports:
-      - 8080:8080
+    image: adminer  
     depends_on: 
       db: 
         condition: service_healthy
   backend: 
-    build: ./backend
-    ports: 
-      - 4000:4000
+    build: ./backend   
     volumes: 
       - ./backend/src:/app/src
     environment:
@@ -38,15 +34,40 @@ services:
         condition: service_healthy 
   frontend: 
     build: ./frontend
-    ports: 
-      - 5173:5173
     volumes: 
       - ./frontend/src:/app/src
     environment:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
+    healthcheck:
+      test: "curl --fail --request GET --url 'http://localhost:5173' || exit 1"
+      interval: 1s
+      timeout: 2s
+      retries: 100
     depends_on:
       backend: 
         condition: service_healthy
+  api-gateway:
+    image: nginx
+    volumes: 
+      - ./ngnix.conf:/etc/nginx/nginx.conf
+    ports:
+      - 7000:80
+    depends_on: 
+      backend: 
+        condition: service_healthy
+      frontend: 
+        condition: service_healthy
+      img: 
+        condition: service_healthy
+  img: 
+    build: ./img
+    healthcheck:
+      test: "curl --fail --request GET --url 'http://localhost:4000' || exit 1"
+      interval: 1s
+      timeout: 2s
+      retries: 100
+    volumes: 
+      - ./img/uploads:/app/uploads
 volumes:
   db-data:

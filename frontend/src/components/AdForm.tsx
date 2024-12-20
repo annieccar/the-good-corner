@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { ErrorMessage } from "@hookform/error-message";
 import { Fragment } from "react/jsx-runtime";
 import { GET_AD_BY_ID, GET_ALL_ADS } from "../graphql/queries";
+import axios from "axios";
+import { useState } from "react";
 
 type Inputs = {
   title: string;
@@ -50,6 +52,8 @@ function AdForm(props: formTypeProps) {
   const { data: tagsData } = useAllTagsQuery();
   const [addAdMutation] = useAddAdMutation();
   const [editAdMutation] = useEditAdMutation();
+  // const [imageFiles, setImageFiles] = useState([]);
+
   const {
     data: addData,
     loading,
@@ -99,27 +103,50 @@ function AdForm(props: formTypeProps) {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log("data from react hook form", data);
+    let pictures: string[] = [];
+
+    try {
+      await Promise.all(
+        data.pictures.map(async (picture) => {
+          const formData = new FormData();
+          formData.append("file", picture.url[0]);
+          const response = await axios.post("/img", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          if (response.status === 201) {
+            pictures.push(response.data.filename);
+          }
+        })
+      );
+    } catch (err) {
+      console.error("error", err);
+    }
+
     let dataForBackend: DataForNewAd = {
       ...data,
       price: parseInt(data.price),
       category: data.category.toString(),
       tags: !data.tags ? [] : data.tags,
-      pictures: data.pictures.map((picture) => picture.url),
+      pictures: pictures,
     };
 
     if (formType === "newAd") {
       console.log("data for backend", dataForBackend);
-      const { data: createdAdData } = await addAdMutation({
-        variables: {
-          data: dataForBackend,
-        },
-        refetchQueries: [GET_ALL_ADS],
-        awaitRefetchQueries: true,
-      });
+      try {
+        const { data: createdAdData } = await addAdMutation({
+          variables: {
+            data: dataForBackend,
+          },
+          refetchQueries: [GET_ALL_ADS],
+          awaitRefetchQueries: true,
+        });
 
-      if (createdAdData) {
-        toast.success("Ad has been added");
-        navigate("/");
+        if (createdAdData) {
+          toast.success("Ad has been added");
+          navigate("/");
+        }
+      } catch (err) {
+        console.error(err);
       }
     }
 
@@ -266,8 +293,17 @@ function AdForm(props: formTypeProps) {
               <li className="image-field" key={field.id}>
                 <input
                   className="text-field"
+                  type="file"
                   {...register(`pictures.${index}.url`, { required: true })}
+                  // name="videofile"
+                  // onChange={(e) => {
+                  //   setImageFiles(e.target.files);
+                  // }}
                 />
+                {/* <input
+                  className="text-field"
+                  {...register(`pictures.${index}.url`, { required: true })}
+                /> */}
                 <button
                   className="button"
                   type="button"

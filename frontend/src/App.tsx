@@ -14,6 +14,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EditAdRHF from "./pages/EditAdRHF";
 import NewAdForm from "./pages/NewAdForm";
+import SingleFileUploader from "./pages/TestFileUpload";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="ad/:id" element={<AdDetails />} />
           <Route path="category/new" element={<NewCategoryForm />} />
           <Route path="/search/:keyword" element={<SearchResults />} />
+          <Route path="/testimg" element={<SingleFileUploader />} />
         </Route>
       </Routes>
       <ToastContainer theme="colored" />
