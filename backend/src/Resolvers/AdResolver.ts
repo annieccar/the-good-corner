@@ -1,6 +1,6 @@
 import { validate } from "class-validator";
 import { Ad } from "../entities/ad";
-import { Arg, Mutation, Query, Resolver} from "type-graphql";
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver} from "type-graphql";
 import { AdInput, AdInputWithId } from "../Inputs/AdInputType";
 import { Picture } from "../entities/picture";
 import { Tag } from "../entities/tag";
@@ -55,8 +55,8 @@ export class AdResolver {
   }
 
   @Mutation(() => Ad)
-  async addAd(@Arg("data") { title, description, owner, price, location, category, pictures, tags }: AdInput) {
-
+  async addAd(@Arg("data") { title, description, owner, price, location, category, pictures, tags }: AdInput, @Ctx() context:any) {
+    console.log("context of create new ad mutation:", context)
     const picturesArray: Picture[] = [];
     pictures?.forEach((el : string)=>{
     const newPicture = new Picture();
@@ -135,8 +135,10 @@ export class AdResolver {
     else return ("Failed updating datas") 
   }
 
+  @Authorized()
   @Mutation(() => String)
-  async deteteAd(@Arg("id") id: number){
+  async deteteAd(@Arg("id") id: number,  @Ctx() context:any){
+    console.log("in the delete ad context:", context)
     const result = await Ad.delete(id)
     console.log("result", result.affected);
     if (result.affected === 1) {

@@ -66,6 +66,7 @@ export type Mutation = {
   addAd: Ad;
   deteteAd: Scalars['String']['output'];
   editAd: Scalars['String']['output'];
+  register: Scalars['String']['output'];
 };
 
 
@@ -83,6 +84,11 @@ export type MutationEditAdArgs = {
   data: AdInputWithId;
 };
 
+
+export type MutationRegisterArgs = {
+  data: UserInput;
+};
+
 export type Picture = {
   __typename?: 'Picture';
   id: Scalars['Float']['output'];
@@ -97,6 +103,7 @@ export type Query = {
   AllCategories: Array<Category>;
   AllTags: Array<Tag>;
   getAdById: Ad;
+  login: Scalars['String']['output'];
 };
 
 
@@ -114,10 +121,20 @@ export type QueryGetAdByIdArgs = {
   id: Scalars['Float']['input'];
 };
 
+
+export type QueryLoginArgs = {
+  data: UserInput;
+};
+
 export type Tag = {
   __typename?: 'Tag';
   id: Scalars['Float']['output'];
   name: Scalars['String']['output'];
+};
+
+export type UserInput = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 };
 
 export type DeteteAdMutationVariables = Exact<{
@@ -176,6 +193,13 @@ export type AllAdsByCategoryQueryVariables = Exact<{
 
 
 export type AllAdsByCategoryQuery = { __typename?: 'Query', AllAdsByCategory: Array<{ __typename?: 'Ad', title: string, price: number, owner: string, location: string, id: number, description: string, createdAt: any, pictures: Array<{ __typename?: 'Picture', id: number, url: string }>, category?: { __typename?: 'Category', id: number, name: string } | null, tags?: Array<{ __typename?: 'Tag', id: number, name: string }> | null }> };
+
+export type LoginQueryVariables = Exact<{
+  data: UserInput;
+}>;
+
+
+export type LoginQuery = { __typename?: 'Query', login: string };
 
 
 export const DeteteAdDocument = gql`
@@ -602,3 +626,41 @@ export type AllAdsByCategoryQueryHookResult = ReturnType<typeof useAllAdsByCateg
 export type AllAdsByCategoryLazyQueryHookResult = ReturnType<typeof useAllAdsByCategoryLazyQuery>;
 export type AllAdsByCategorySuspenseQueryHookResult = ReturnType<typeof useAllAdsByCategorySuspenseQuery>;
 export type AllAdsByCategoryQueryResult = Apollo.QueryResult<AllAdsByCategoryQuery, AllAdsByCategoryQueryVariables>;
+export const LoginDocument = gql`
+    query Login($data: UserInput!) {
+  login(data: $data)
+}
+    `;
+
+/**
+ * __useLoginQuery__
+ *
+ * To run a query within a React component, call `useLoginQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLoginQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLoginQuery({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useLoginQuery(baseOptions: Apollo.QueryHookOptions<LoginQuery, LoginQueryVariables> & ({ variables: LoginQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LoginQuery, LoginQueryVariables>(LoginDocument, options);
+      }
+export function useLoginLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LoginQuery, LoginQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LoginQuery, LoginQueryVariables>(LoginDocument, options);
+        }
+export function useLoginSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LoginQuery, LoginQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LoginQuery, LoginQueryVariables>(LoginDocument, options);
+        }
+export type LoginQueryHookResult = ReturnType<typeof useLoginQuery>;
+export type LoginLazyQueryHookResult = ReturnType<typeof useLoginLazyQuery>;
+export type LoginSuspenseQueryHookResult = ReturnType<typeof useLoginSuspenseQuery>;
+export type LoginQueryResult = Apollo.QueryResult<LoginQuery, LoginQueryVariables>;

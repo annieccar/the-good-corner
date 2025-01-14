@@ -121,3 +121,9 @@ query AllAdsByCategory($category: Float!) {
   }
 }
 `
+
+export const LOGIN = gql`
+  query Login($data: UserInput!) {
+  login(data: $data)
+}
+`;
