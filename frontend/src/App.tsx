@@ -16,6 +16,7 @@ import EditAdRHF from "./pages/EditAdRHF";
 import NewAdForm from "./pages/NewAdForm";
 import SingleFileUploader from "./pages/TestFileUpload";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
           <Route path="ad/new" element={<NewAdForm />} />
           <Route path="ads/category/:id" element={<AdsByCategory />} />
           <Route path="ads/edit-test-rhf/:id" element={<EditAdRHF />} />

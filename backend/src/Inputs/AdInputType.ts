@@ -13,9 +13,6 @@ export class AdInput   {
     description: string
 
     @Field()
-    owner: string 
-
-    @Field()
  	price: number
 
     @Field()
@@ -41,9 +38,6 @@ export class AdInputWithId   {
 
     @Field({nullable : true})
     description: string
-
-    @Field({nullable : true})
-    owner: string 
 
     @Field({nullable : true})
  	price: number

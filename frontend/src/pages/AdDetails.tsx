@@ -19,8 +19,6 @@ function AdDetails() {
     variables: { getAdByIdId: parseFloat(id!) },
   });
 
-  // ***TO DO Homepage does not refresh after deletion
-
   const [deteteAdMutation] = useDeteteAdMutation({
     variables: {
       deteteAdId: parseFloat(id!), // value for 'deteteAdId'
@@ -63,7 +61,7 @@ function AdDetails() {
             <div className="ad-details-description">{ad.description}</div>
             <hr className="separator" />
             <div className="ad-details-owner">
-              Ad published by <b>{ad.owner}</b> on {date}.
+              Ad published by <b>{ad.user.email}</b> on {date}.
             </div>
             <a
               href="mailto:serge@serge.com"

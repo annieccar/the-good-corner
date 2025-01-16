@@ -3,24 +3,27 @@ import { gql } from "@apollo/client";
 export const GET_ALL_ADS = gql`
   query GetAds {
     AllAds {
-      id
-      title
-      description
-      owner
-      price
-      location
-      createdAt
-      pictures {
-        id
-        url
-      }
       category {
         id
         name
       }
+      createdAt
+      description
+      id
+      location
+      pictures {
+        id
+        url
+      }
+      price
       tags {
         id
         name
+      }
+      title
+      user {
+        email
+        id
       }
     }
   }
@@ -29,24 +32,27 @@ export const GET_ALL_ADS = gql`
 export const GET_ALL_ADS_BY_KEYWORD = gql`
 query AllAdsByKeyword($keyword: String!) {
   AllAdsByKeyword(keyword: $keyword) {
-    id
-    title
-    description
-    owner
-    price
-    location
-    createdAt
-    pictures {
-      id
-      url
-    }
     category {
       id
       name
     }
+    createdAt
+    description
+    id
+    location
+    pictures {
+      id
+      url
+    }
+    price
     tags {
       id
       name
+    }
+    title
+    user {
+      email
+      id
     }
   }
 }
@@ -73,24 +79,27 @@ export const GET_ALL_TAGS = gql`
 export const GET_AD_BY_ID = gql`
   query GetAdById($getAdByIdId: Float!) {
     getAdById(id: $getAdByIdId) {
-      id
-      title
-      description
-      owner
-      price
-      location
-      createdAt
-      pictures {
-        id
-        url
-      }
       category {
         id
         name
       }
+      createdAt
+      description
+      id
+      location
+      pictures {
+        id
+        url
+      }
+      price
       tags {
         id
         name
+      }
+      title
+      user {
+        email
+        id
       }
     }
   }
@@ -105,7 +114,6 @@ query AllAdsByCategory($category: Float!) {
       id
       url
     }
-    owner
     location
     id
     description
@@ -122,8 +130,28 @@ query AllAdsByCategory($category: Float!) {
 }
 `
 
-export const LOGIN = gql`
-  query Login($data: UserInput!) {
-  login(data: $data)
+export const ALL_CATEGORIES_AND_USER_INFO = gql`
+  query AllCategoriesAndUserInfo {
+    AllCategories {
+      id
+      name
+    }
+    getUserInfo {
+      email
+      isLoggedIn
+      userId
+      userRole
+    }
 }
+`;
+
+export const USER_INFO = gql`
+  query GetUserInfo {
+    getUserInfo {
+      email
+      isLoggedIn
+      userId
+      userRole
+    }
+  }
 `;
