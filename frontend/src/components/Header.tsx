@@ -1,16 +1,27 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client";
-import { GET_ALL_CATEGORIES } from "../graphql/queries";
 
+import { Link, useNavigate } from "react-router-dom";
+import {
+  useAllCategoriesAndUserInfoQuery,
+  useLogoutMutation,
+} from "../generated/graphql-types";
+import { USER_INFO } from "../graphql/queries";
 export type Category = {
   id: number;
   name: string;
 };
 
 const Header = () => {
-  const { data } = useQuery(GET_ALL_CATEGORIES);
+  const { data } = useAllCategoriesAndUserInfoQuery({
+    fetchPolicy: "network-only",
+  });
+  const [logoutMutation] = useLogoutMutation({
+    refetchQueries: [{ query: USER_INFO }],
+  });
   const [search, setSearch] = useState("");
+
+  console.log(data);
+  const isUserConnected = data?.getUserInfo.isLoggedIn;
 
   const categories = data?.AllCategories;
 
@@ -52,10 +63,31 @@ const Header = () => {
             </svg>
           </button>
         </form>
-        <a href="/ad/new" className="button link-button">
-          <span className="mobile-short-label">Publier</span>
-          <span className="desktop-long-label">Publier une annonce</span>
-        </a>
+        <div>
+          {!isUserConnected && (
+            <a href="/login" className="button link-button">
+              <span className="mobile-short-label">Login</span>
+              <span className="desktop-long-label">Login</span>
+            </a>
+          )}
+          {isUserConnected && (
+            <>
+              <a href="/ad/new" className="button link-button">
+                <span className="mobile-short-label">Publier</span>
+                <span className="desktop-long-label">Publier une annonce</span>
+              </a>
+              <button
+                className="button link-button"
+                onClick={() => {
+                  logoutMutation();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </button>
+            </>
+          )}
+        </div>
       </div>
       <nav className="categories-navigation">
         {categories?.map((category: Category) => (

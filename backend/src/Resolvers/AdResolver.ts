@@ -54,8 +54,9 @@ export class AdResolver {
      return ad
   }
 
+  @Authorized()
   @Mutation(() => Ad)
-  async addAd(@Arg("data") { title, description, owner, price, location, category, pictures, tags }: AdInput, @Ctx() context:any) {
+  async addAd(@Arg("data") { title, description, price, location, category, pictures, tags }: AdInput, @Ctx() context:any) {
     console.log("context of create new ad mutation:", context)
     const picturesArray: Picture[] = [];
     pictures?.forEach((el : string)=>{
@@ -73,11 +74,11 @@ export class AdResolver {
     const ad = new Ad(); 
     ad.title = title;
     ad.description = description;
-    ad.owner = owner;
     ad.price = price;
     ad.location = location;
     ad.createdAt = new Date();
     ad.category= category ;
+    ad.user = context.payload.userId;
     if(picturesArray.length > 0){
       ad.pictures = picturesArray
     }
@@ -105,37 +106,37 @@ export class AdResolver {
   }
 
   @Mutation(() => String)
-  async editAd(@Arg("data") { id, title, description, owner, price, location, category, pictures, tags }: AdInputWithId) {
-  
+  async editAd(@Arg("data") { id, title, description, price, location, category, pictures, tags }: AdInputWithId) {
+    
     const picturesArray: Picture[] = [];
     pictures?.forEach((el : string)=>{
-    const newPicture = new Picture();
-    newPicture.url = el;
-    picturesArray.push(newPicture)
-  })
+      const newPicture = new Picture();
+      newPicture.url = el;
+      picturesArray.push(newPicture)
+    })
 
-  let tagsObject:Tag[] = []
-  if(!!tags && tags.length >0) {tagsObject = await Promise.all(tags.map((tag) => {return Tag.findOneByOrFail({
-    id: tag,
+    let tagsObject:Tag[] = []
+    if(!!tags && tags.length >0) {tagsObject = await Promise.all(tags.map((tag) => {return Tag.findOneByOrFail({
+      id: tag,
     }) }))}  
-  
+    
     const adToUpdate = await Ad.findOneByOrFail({
       id: id,
-  })
+    })
 
-  const updatedAd = Object.assign(adToUpdate, { id, title, description, owner, price, location, category  } );
-  if(picturesArray.length > 0){
-    updatedAd.pictures = picturesArray
-  }
-  if(!!tags){
-    updatedAd.tags = tagsObject
-  }
-  const result = await updatedAd.save()
-    if (result){return("ad has been updated")}
-    else return ("Failed updating datas") 
+    const updatedAd = Object.assign(adToUpdate, { id, title, description, price, location, category  } );
+    if(picturesArray.length > 0){
+      updatedAd.pictures = picturesArray
+    }
+    if(!!tags){
+      updatedAd.tags = tagsObject
+    }
+    const result = await updatedAd.save()
+      if (result){return("ad has been updated")}
+      else return ("Failed updating datas") 
   }
 
-  @Authorized()
+  @Authorized("ADMIN")
   @Mutation(() => String)
   async deteteAd(@Arg("id") id: number,  @Ctx() context:any){
     console.log("in the delete ad context:", context)

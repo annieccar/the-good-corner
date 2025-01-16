@@ -1,22 +1,17 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { Fragment } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useLoginMutation } from "../generated/graphql-types";
+import { useRegisterMutation } from "../generated/graphql-types";
 import { useNavigate } from "react-router-dom";
-import { USER_INFO } from "../graphql/queries";
 
 type Inputs = {
   email: string;
   password: string;
 };
 
-function Login() {
-  const [loginMutation] = useLoginMutation({
-    refetchQueries: [{ query: USER_INFO }],
-  });
-
+function Register() {
+  const [registerMutation] = useRegisterMutation();
   const navigate = useNavigate();
-
   const {
     register,
     handleSubmit,
@@ -24,7 +19,7 @@ function Login() {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    loginMutation({
+    registerMutation({
       variables: {
         data: {
           email: data.email,
@@ -33,6 +28,7 @@ function Login() {
       },
       onCompleted: (result) => {
         console.log(result);
+        localStorage.setItem("token", result.register);
         navigate("/");
       },
       onError: (error) => {
@@ -96,11 +92,11 @@ function Login() {
             })
           }
         />
-        <a href="/register">Register</a>
+
         <input type="submit" className="button" />
       </form>
     </div>
   );
 }
 
-export default Login;
+export default Register;

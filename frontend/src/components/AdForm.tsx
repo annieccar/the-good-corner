@@ -12,7 +12,6 @@ import { ErrorMessage } from "@hookform/error-message";
 import { Fragment } from "react/jsx-runtime";
 import { GET_AD_BY_ID, GET_ALL_ADS } from "../graphql/queries";
 import axios from "axios";
-import { useState } from "react";
 
 type Inputs = {
   title: string;
@@ -90,7 +89,6 @@ function AdForm(props: formTypeProps) {
       description: prefilledDatas?.description,
       pictures: prefilledDatasPictures,
       location: prefilledDatas?.location,
-      owner: prefilledDatas?.owner,
       price: prefilledDatas?.price.toString(),
       tags: prefilledDatas?.tags?.map((tag) => tag.id.toString()),
     },
@@ -230,34 +228,6 @@ function AdForm(props: formTypeProps) {
             })
           }
         />
-
-        <label className="label">
-          Vendeur:
-          <input
-            className="text-field"
-            {...register("owner", {
-              minLength: { value: 2, message: "Minimum 2 characters" },
-              required: "This field is required",
-            })}
-          />
-        </label>
-        <ErrorMessage
-          errors={errors}
-          name="owner"
-          render={({ messages }) =>
-            messages &&
-            Object.entries(messages).map(([type, message]) => {
-              console.log(message);
-              return (
-                <Fragment key={type}>
-                  <br />
-                  <span className="error-message">{message}</span>
-                </Fragment>
-              );
-            })
-          }
-        />
-
         <label className="label">
           Prix :
           <input

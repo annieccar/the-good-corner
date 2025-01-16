@@ -25,8 +25,6 @@ const RecentAds = () => {
   const { loading, error, data } = useGetAdsQuery();
   const [total, setTotal] = useState(0);
 
-  console.log(data);
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error : {error.message}</p>;
   if (data) {

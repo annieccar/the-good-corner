@@ -13,7 +13,6 @@ export const CREATE_AD = gql`
       id
       title
       description
-      owner
       price
       location
       createdAt
@@ -36,5 +35,23 @@ export const CREATE_AD = gql`
 export const EDIT_AD = gql`
   mutation EditAd($data: AdInputWithId!) {
   editAd(data: $data)
+}
+`;
+
+export const LOGIN = gql`
+  mutation Login($data: UserInput!) {
+  login(data: $data)
+}
+`;
+
+export const LOGOUT = gql`
+ mutation Logout{
+  logout
+}
+`;
+
+export const REGISTER = gql`
+  mutation Register($data: UserInput!) {
+  register(data: $data)
 }
 `;
