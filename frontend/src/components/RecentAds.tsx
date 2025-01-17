@@ -34,7 +34,7 @@ const RecentAds = () => {
         <p>Prix total: {total} </p>
         <section className="recent-ads">
           {data.AllAds.map((ad) => (
-            <div className="ad-container">
+            <div key={ad.id} className="ad-container">
               <AdCard
                 id={ad.id}
                 title={ad.title}

@@ -1,7 +1,10 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { Fragment } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useRegisterMutation } from "../generated/graphql-types";
+import {
+  useConfirmEmailMutation,
+  useRegisterMutation,
+} from "../generated/graphql-types";
 import { useNavigate } from "react-router-dom";
 
 type Inputs = {
@@ -10,7 +13,10 @@ type Inputs = {
 };
 
 function Register() {
-  const [registerMutation] = useRegisterMutation();
+  // const [registerMutation] = useRegisterMutation();
+
+  const [confirmEmailMutation] = useConfirmEmailMutation({});
+
   const navigate = useNavigate();
   const {
     register,
@@ -19,7 +25,7 @@ function Register() {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    registerMutation({
+    confirmEmailMutation({
       variables: {
         data: {
           email: data.email,
@@ -28,13 +34,29 @@ function Register() {
       },
       onCompleted: (result) => {
         console.log(result);
-        localStorage.setItem("token", result.register);
-        navigate("/");
+        navigate("/confirm_email");
       },
       onError: (error) => {
         console.log(error);
       },
     });
+
+    // registerMutation({
+    //   variables: {
+    //     data: {
+    //       email: data.email,
+    //       password: data.password,
+    //     },
+    //   },
+    //   onCompleted: (result) => {
+    //     console.log(result);
+    //     localStorage.setItem("token", result.register);
+    //     navigate("/");
+    //   },
+    //   onError: (error) => {
+    //     console.log(error);
+    //   },
+    // });
   };
 
   return (

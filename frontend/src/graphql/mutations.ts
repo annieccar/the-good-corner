@@ -50,8 +50,14 @@ export const LOGOUT = gql`
 }
 `;
 
+export const CONFIRM_EMAIL = gql`
+ mutation ConfirmEmail($data: UserInput!) {
+  confirmEmail(data: $data)
+}
+`;
+
 export const REGISTER = gql`
-  mutation Register($data: UserInput!) {
+  mutation Register($data: Float!) {
   register(data: $data)
 }
 `;
