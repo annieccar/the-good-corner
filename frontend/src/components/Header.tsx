@@ -20,7 +20,6 @@ const Header = () => {
   });
   const [search, setSearch] = useState("");
 
-  console.log(data);
   const isUserConnected = data?.getUserInfo.isLoggedIn;
 
   const categories = data?.AllCategories;

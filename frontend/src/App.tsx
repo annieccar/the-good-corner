@@ -17,6 +17,7 @@ import NewAdForm from "./pages/NewAdForm";
 import SingleFileUploader from "./pages/TestFileUpload";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ConfirmEmail from "./pages/ConfirmEmail";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="confirm_email" element={<ConfirmEmail />} />
           <Route path="ad/new" element={<NewAdForm />} />
           <Route path="ads/category/:id" element={<AdsByCategory />} />
           <Route path="ads/edit-test-rhf/:id" element={<EditAdRHF />} />
